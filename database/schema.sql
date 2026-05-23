@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS actividades_deportivas
+CREATE DATABASE IF NOT EXISTS actividades_deportivas;
 
 USE actividades_deportivas;
 
@@ -81,3 +81,4 @@ CREATE TABLE asistencia (
     -- no puede haber dos registros para el mismo inscripto en la misma fecha
     CONSTRAINT uq_insc_fecha    UNIQUE (id_inscripcion, fecha)
 );
+
