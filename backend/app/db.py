@@ -2,6 +2,7 @@ import mysql.connector
 import time
 from mysql.connector import pooling
 from config import Config
+from datetime import timedelta
 
 _pool = None
 
@@ -33,6 +34,10 @@ def query(sql: str, params: tuple = (), one: bool = False):
         cursor = conn.cursor(dictionary=True)
         cursor.execute(sql, params)
         result = cursor.fetchone() if one else cursor.fetchall()
+        for row in result:
+            for key, value in row.items():
+                if isinstance(value, timedelta):
+                    row[key] = str(value)
         return result
     finally:
         cursor.close()
@@ -52,3 +57,4 @@ def execute(sql: str, params: tuple = ()):
     finally:
         cursor.close()
         conn.close()
+

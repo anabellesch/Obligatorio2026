@@ -1,16 +1,15 @@
 from flask import Blueprint, request
 from app.db import query, execute
 from app.utils.responses import ok, created, error, not_found, conflict, server_error
-from app.utils.validators import required_fields
+from app.utils.validators import required_fields, valid_email
 import mysql.connector
 
 bp = Blueprint("estudiante", __name__)
  
 FIELDS_REQUIRED = ["documento", "nombre", "apellido", "email", "carrera", "facultad"]
 
-def get_or_404 (id):
-    est = query ("SELECT * FROM estudiante WHERE id = %s AND activo = 1", (id,), one=True)
-    return est or not_found()
+def get_or_404(id_estudiante):
+    return query("SELECT * FROM estudiante WHERE id_estudiante = %s AND activo = 1", (id_estudiante,), one=True)
 
 @bp.route("/", methods=["GET"])
 def listar ():
@@ -18,8 +17,10 @@ def listar ():
     return ok(estudiante)
 
 @bp.route("/<int:id_estudiante>", methods=["GET"])
-def obtener (id):
-    est = get_or_404(id)
+def obtener(id_estudiante):
+    est = get_or_404(id_estudiante)
+    if not est:
+        return not_found("Estudiante no encontrado")
     return ok(est)
 
 
@@ -55,8 +56,8 @@ def crear ():
         return server_error(str(e))
 
 @bp.route("/<int:id_estudiante>", methods=["PUT"])
-def actualizar (id):
-    est = _get_or_404(id_estudiante)
+def actualizar(id_estudiante):
+    est = get_or_404(id_estudiante)
     if not est:
         return not_found("Estudiante no encontrado")
  
@@ -92,13 +93,17 @@ def actualizar (id):
 
 
 @bp.route("/<int:id_estudiante>", methods=["DELETE"])
-def eliminar (id):
-    est = _get_or_404(id_estudiante)
+def eliminar(id_estudiante):
+    est = get_or_404(id_estudiante)
+
     if not est:
         return not_found("Estudiante no encontrado")
- 
+
     try:
-        execute("UPDATE estudiante SET activo=0 WHERE id_estudiante=%s", (id_estudiante,))
+        execute(
+            "UPDATE estudiante SET activo = 0 WHERE id_estudiante = %s",
+            (id_estudiante,)
+        )
         return ok(message="Estudiante eliminado correctamente")
     except Exception as e:
         return server_error(str(e))
@@ -106,7 +111,7 @@ def eliminar (id):
 
 @bp.route("/<int:id_estudiante>/inscripciones", methods=["GET"]) #n CONSLUTA ADICIONAL PARA OBTENER LAS INSCRIPCIONES DE UN ESTUDIANTE
 def inscripciones_del_estudiante(id_estudiante):
-    est = _get_or_404(id_estudiante)
+    est = get_or_404(id_estudiante)
     if not est:
         return not_found("Estudiante no encontrado")
  
