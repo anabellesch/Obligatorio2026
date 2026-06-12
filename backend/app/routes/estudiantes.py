@@ -104,7 +104,7 @@ def eliminar(id_estudiante):
             "UPDATE estudiante SET activo = 0 WHERE id_estudiante = %s",
             (id_estudiante,)
         )
-        return ok(message="Estudiante eliminado correctamente")
+        return ok(msg="Estudiante eliminado correctamente")
     except Exception as e:
         return server_error(str(e))
 

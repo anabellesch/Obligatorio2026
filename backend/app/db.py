@@ -1,5 +1,4 @@
 import mysql.connector
-import time
 from mysql.connector import pooling
 from config import Config
 from datetime import timedelta
@@ -28,16 +27,27 @@ def get_connection():
     return get_pool().get_connection()
 
 
+def _convert_timedeltas(row):
+    """Convierte columnas TIME (timedelta) a string 'HH:MM:SS'."""
+    for key, value in row.items():
+        if isinstance(value, timedelta):
+            row[key] = str(value)
+    return row
+
+
 def query(sql: str, params: tuple = (), one: bool = False):
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(sql, params)
         result = cursor.fetchone() if one else cursor.fetchall()
-        for row in result:
-            for key, value in row.items():
-                if isinstance(value, timedelta):
-                    row[key] = str(value)
+
+        if one:
+            if result is not None:
+                result = _convert_timedeltas(result)
+        else:
+            result = [_convert_timedeltas(row) for row in result]
+
         return result
     finally:
         cursor.close()
@@ -57,4 +67,3 @@ def execute(sql: str, params: tuple = ()):
     finally:
         cursor.close()
         conn.close()
-
