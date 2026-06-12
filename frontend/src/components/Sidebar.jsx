@@ -2,15 +2,15 @@ import { NavLink } from 'react-router-dom'
 
 const links = [
   { section: 'Gestión' },
-  { to: '/estudiantes',   icon: '👤', label: 'Estudiantes' },
-  { to: '/actividades',   icon: '⚽', label: 'Actividades' },
-  { to: '/inscripciones', icon: '📋', label: 'Inscripciones' },
-  { to: '/asistencias',   icon: '✅', label: 'Asistencias' },
+  { to: '/estudiantes',  label: 'Estudiantes' },
+  { to: '/actividades',    label: 'Actividades' },
+  { to: '/inscripciones',  label: 'Inscripciones' },
+  { to: '/asistencias',    label: 'Asistencias' },
   { section: 'Configuración' },
-  { to: '/disciplinas',   icon: '🏅', label: 'Disciplinas' },
-  { to: '/espacios',      icon: '🏟️', label: 'Espacios' },
+  { to: '/disciplinas',    label: 'Disciplinas' },
+  { to: '/espacios',     label: 'Espacios' },
   { section: 'Análisis' },
-  { to: '/reportes',      icon: '📊', label: 'Reportes' },
+  { to: '/reportes',   label: 'Reportes' },
 ]
 
 export default function Sidebar() {
@@ -30,7 +30,6 @@ export default function Sidebar() {
               to={l.to}
               className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}
             >
-              <span className="icon">{l.icon}</span>
               {l.label}
             </NavLink>
           )
