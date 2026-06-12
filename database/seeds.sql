@@ -60,11 +60,11 @@ VALUES
 (5,'2026-05-22', 0);
 
 
--- usr admin pwd admin123 bcrypt rounds=12
+
 
 INSERT INTO usuarios (username, password_hash, rol) VALUES
 (
   'admin',
-  '$2b$12$KIXxMwT8DG5VaIH1e/3R5OyGj3jq6LHCY7Y6sFpGkqPyvMqKqLbi',
+  '$2b$12$.xNGmT9JtOUQ1.RspInuJu4VQ3W8F7qjemZrwrVPgvxyYLthbccfW',
   'admin'
 );

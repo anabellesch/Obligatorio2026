@@ -119,3 +119,49 @@ tbody tr:last-child td { border-bottom: none; }
 .progress-fill { height: 100%; background: var(--green); border-radius: 99px; }
 .progress-fill.danger { background: var(--red); }
 .progress-fill.warning { background: var(--yellow); }
+
+.sidebar-footer {
+  padding: 12px 20px 20px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  margin-top: auto;
+}
+
+.sidebar-user {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.sidebar-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.sidebar-user-rol {
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--radius);
+  color: rgba(255,255,255,.8);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  text-align: center;
+}
+
+.sidebar-logout-btn:hover {
+  background: rgba(192,57,43,.6);
+  border-color: transparent;
+  color: var(--white);
+}

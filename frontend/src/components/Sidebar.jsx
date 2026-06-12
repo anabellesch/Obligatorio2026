@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom'
-
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 const links = [
   { section: 'Gestión' },
   { to: '/estudiantes',  label: 'Estudiantes' },
@@ -14,6 +14,14 @@ const links = [
 ]
 
 export default function Sidebar() {
+
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+  async function handleLogout() {
+    await logout()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -35,7 +43,7 @@ export default function Sidebar() {
           )
         )}
 
-        {onLogout && (
+        {user && (
         <div className="sidebar-footer">
           {user && (
             <div className="sidebar-user">
@@ -43,7 +51,7 @@ export default function Sidebar() {
               <span className="sidebar-user-rol">{user.rol}</span>
             </div>
           )}
-          <button className="sidebar-logout-btn" onClick={onLogout}>
+          <button className="sidebar-logout-btn" onClick={handleLogout}>
             Cerrar sesión
           </button>
         </div>

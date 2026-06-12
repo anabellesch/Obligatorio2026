@@ -42,7 +42,7 @@ def login():
     if not user or not user["activo"]:
         return error("Credenciales inválidas", 401)
 
-    if not bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
+    if not bcrypt.checkpw(password.encode(), user["password_hash"].encode('utf-8')):
         return error("Credenciales inválidas", 401)
 
     token = _make_token(user)
@@ -65,3 +65,27 @@ def me():
         data={"username": g.current_user["username"], "rol": g.current_user["rol"]},
         msg="OK",
     )
+
+@bp.route("/register", methods=["POST"])
+def register():
+    body = request.get_json(silent=True) or {}
+    username = (body.get("username") or "").strip()
+    password = (body.get("password") or "").strip()
+    rol      = (body.get("rol") or "usuario").strip()
+
+    if not username or not password:
+        return error("Usuario y contraseña son obligatorios", 400)
+
+    existing = _user_by_username(username)
+    if existing:
+        return error("El usuario ya existe", 409)
+
+    password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+    query(
+        "INSERT INTO usuarios (username, password_hash, rol, activo) VALUES (%s, %s, %s, 1)",
+        (username, password_hash, rol),
+        one=False,
+    )
+
+    return ok(msg="Usuario creado", status=201)

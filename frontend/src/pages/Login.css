@@ -61,7 +61,7 @@
  
 .login-field input {
   padding: 0.65rem 0.85rem;
-  border: 1.5px solid #3c8f4a;
+  border: 1.5px solid #1f5c39;
   border-radius: 7px;
   font-size: 0.95rem;
   color: #2d3748;
@@ -71,7 +71,7 @@
 }
  
 .login-field input:focus {
-  border-color: #3c8f4a;
+  border-color: #1f5c39;
   background: #fff;
 }
  
@@ -92,7 +92,7 @@
 .login-btn {
   margin-top: 0.4rem;
   padding: 0.75rem;
-  background: #3c8f4a;
+  background: #1f5c39;
   color: #fff;
   border: none;
   border-radius: 7px;
@@ -103,7 +103,7 @@
 }
  
 .login-btn:hover:not(:disabled) {
-  background: #6ec27c;
+  background: #2d7a4f;
 }
  
 .login-btn:disabled {

@@ -17,6 +17,12 @@ services:
       - mysql-data:/var/lib/mysql
       - ./database:/docker-entrypoint-initdb.d
 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pdragonballz1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
     build: ./backend
 
@@ -26,7 +32,8 @@ services:
       - "5000:5000"
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
     environment:
       DB_HOST: db

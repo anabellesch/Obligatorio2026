@@ -25,7 +25,7 @@ export default function Login() {
     setLoading(true)
     try {
       await login(form)
-      navigate('/', { replace: true })
+      navigate('/estudiantes', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {

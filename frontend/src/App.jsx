@@ -20,7 +20,7 @@ function AppLayout() {
       <Sidebar onLogout={logout} user={user} />
       <main className="main-content">
         <Routes>
-          <Route path="/"              element={<Navigate to="/estudiantes" replace />} />
+          <Route index element={<Navigate to="/estudiantes" replace />} />
           <Route path="/estudiantes"   element={<Estudiantes />} />
           <Route path="/disciplinas"   element={<Disciplinas />} />
           <Route path="/espacios"      element={<Espacios />} />
@@ -39,18 +39,21 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
 
-            <Route
-              path="/*"
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+
+                <Route
+                  path="/*"
+                  element={
+                    <ProtectedRoute>
+                    <AppLayout />
+                    </ProtectedRoute>
+                  }
+                />
+
+                  <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
