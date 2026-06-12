@@ -3,11 +3,13 @@ import { getEstudiantes, createEstudiante, updateEstudiante, deleteEstudiante } 
 import Modal from '../components/Modal'
 import Confirm from '../components/Confirm'
 import { useToast } from '../components/Toast'
+import { useAuth } from '../context/AuthContext'
 
 const EMPTY = { documento:'', nombre:'', apellido:'', email:'', carrera:'', facultad:'' }
 
 export default function Estudiantes() {
   const toast = useToast()
+  const { hasPermiso } = useAuth()
   const [data, setData]         = useState([])
   const [loading, setLoading]   = useState(true)
   const [search, setSearch]     = useState('')
@@ -16,7 +18,8 @@ export default function Estudiantes() {
   const [editId, setEditId]     = useState(null)
   const [confirm, setConfirm]   = useState(null)
   const [saving, setSaving]     = useState(false)
-
+  const puedeModificar = hasPermiso('estudiantes', 'modificar')
+  
   const load = useCallback(() => {
     setLoading(true)
     getEstudiantes().then(setData).catch(() => toast('Error al cargar estudiantes', 'error')).finally(() => setLoading(false))
@@ -58,7 +61,9 @@ export default function Estudiantes() {
     <div>
       <div className="page-header">
         <div><h1>Estudiantes</h1><p>{data.length} registrados</p></div>
-        <button className="btn btn-primary" onClick={openCreate}>+ Nuevo estudiante</button>
+        {puedeModificar && (
+          <button className="btn btn-primary" onClick={openCreate}>+ Nuevo estudiante</button>
+        )}
       </div>
 
       <div className="card">
@@ -82,10 +87,12 @@ export default function Estudiantes() {
                     <td>{e.carrera}</td>
                     <td>{e.facultad}</td>
                     <td>
-                      <div style={{display:'flex',gap:6}}>
-                        <button className="btn btn-ghost btn-sm" onClick={() => openEdit(e)}>Editar</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => setConfirm(e.id_estudiante)}>Eliminar</button>
-                      </div>
+                      {puedeModificar && (
+                        <div style={{display:'flex',gap:6}}>
+                          <button className="btn btn-ghost btn-sm" onClick={() => openEdit(e)}>Editar</button>
+                          <button className="btn btn-danger btn-sm" onClick={() => setConfirm(e.id_estudiante)}>Eliminar</button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

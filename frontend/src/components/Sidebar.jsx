@@ -13,14 +13,27 @@ const links = [
   { to: '/reportes',   label: 'Reportes' },
 ]
 
+function getVisibleLinks(links, hasPermiso) {
+  const visible = links.filter(l => l.section || hasPermiso(l.seccion, 'ver'))
+ 
+  return visible.filter((l, i) => {
+    if (!l.section) return true
+    const next = visible[i + 1]
+
+    return next && !next.section
+  }
+  )
+}
 export default function Sidebar() {
 
-  const { user, logout } = useAuth()
+  const { user, logout, hasPermiso } = useAuth()
   const navigate = useNavigate()
   async function handleLogout() {
     await logout()
     navigate('/login', { replace: true })
   }
+
+  const visibleLinks = getVisibleLinks(links, hasPermiso)
 
   return (
     <aside className="sidebar">

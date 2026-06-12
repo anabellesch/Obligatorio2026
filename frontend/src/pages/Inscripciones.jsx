@@ -6,6 +6,7 @@ import Modal from '../components/Modal'
 import Confirm from '../components/Confirm'
 import Badge from '../components/Badge'
 import { useToast } from '../components/Toast'
+import { useAuth } from '../context/AuthContext'
 
 export default function Inscripciones() {
   const toast = useToast()
@@ -18,15 +19,32 @@ export default function Inscripciones() {
   const [confirm, setConfirm]   = useState(null)
   const [saving, setSaving]     = useState(false)
   const [filtroEst, setFiltroEst] = useState('')
+  const { user } = useAuth()
+  const isEstudiante = user?.rol === 'estudiante'
+  const { hasPermiso } = useAuth()
+  const puedeModificar = hasPermiso('inscripciones', 'modificar')
 
   const load = useCallback(() => {
     setLoading(true)
-    Promise.all([getInscripciones(), getEstudiantes(), getActividades('abierta')])
+
+    const filtros = isEstudiante ? { id_estudiante: user.id_estudiante } : {}
+ 
+    const requests = isEstudiante
+      ? [getInscripciones(filtros), Promise.resolve([]), getActividades('abierta')]
+      : [getInscripciones(filtros), getEstudiantes(), getActividades('abierta')]
+
+
+    Promise.all(requests)
       .then(([ins, ests, acts]) => { setData(ins); setEsts(ests); setActs(acts) })
       .catch(() => toast('Error al cargar', 'error'))
       .finally(() => setLoading(false))
-  }, [toast])
+  }, [toast, isEstudiante, user?.id_estudiante])
  useEffect(() => { const t = setTimeout(load, 0); return () => clearTimeout(t) }, [load])
+
+ const openModal = () => {
+    setForm({ id_estudiante: isEstudiante ? user.id_estudiante : '', id_actividad: '' })
+    setModal(true)
+  }
 
   const filtered = data.filter(i =>
     !filtroEst || `${i.estudiante_nombre} ${i.estudiante_apellido}`.toLowerCase().includes(filtroEst.toLowerCase())
@@ -51,18 +69,22 @@ export default function Inscripciones() {
   return (
     <div>
       <div className="page-header">
-        <div><h1>Inscripciones</h1><p>{data.length} registradas</p></div>
-        <button className="btn btn-primary" onClick={() => setModal(true)}>+ Nueva inscripción</button>
+        <div><h1>{isEstudiante ? 'Mis Inscripciones' : 'Inscripciones'}</h1><p>{data.length} registradas</p></div>
+        {puedeModificar && (
+          <button className="btn btn-primary" onClick={openModal}>+ Nueva inscripción</button>
+        )}
       </div>
 
       <div className="card">
+        {!isEstudiante && (
         <div className="toolbar">
           <input className="search-input" placeholder="Buscar estudiante..." value={filtroEst} onChange={e=>setFiltroEst(e.target.value)} />
-        </div>
+        </div> ) }
         {loading ? <div className="loading">Cargando...</div> : (
           <div className="table-wrapper">
             <table>
               <thead><tr>
+                {!isEstudiante && <th>Estudiante</th>}
                 <th>Estudiante</th><th>Actividad</th><th>Disciplina</th><th>Día / Horario</th><th>Estado</th><th>Fecha inscripción</th><th>Acciones</th>
               </tr></thead>
               <tbody>
@@ -70,14 +92,17 @@ export default function Inscripciones() {
                   <tr><td colSpan={7}><div className="empty"><div className="empty-icon">📋</div><p>No hay inscripciones</p></div></td></tr>
                 ) : filtered.map(i => (
                   <tr key={i.id_inscripcion}>
+                    {!isEstudiante && (
                     <td><strong>{i.estudiante_apellido}</strong>, {i.estudiante_nombre}<br/><small style={{color:'var(--gray-400)'}}>{i.documento}</small></td>
+                    )}
                     <td>{i.actividad_nombre}</td>
                     <td>{i.disciplina}</td>
                     <td>{i.dia} {i.horario?.slice(0,5)}</td>
                     <td><Badge value={i.estado} />{i.orden_espera && <small style={{color:'var(--gray-400)',marginLeft:4}}>#{i.orden_espera}</small>}</td>
                     <td>{new Date(i.fecha_inscripcion).toLocaleDateString('es-UY')}</td>
                     <td>
-                      {i.estado !== 'cancelada' && (
+                      {puedeModificar &&
+                        i.estado !== 'cancelada' && (
                         <button className="btn btn-danger btn-sm" onClick={() => setConfirm(i.id_inscripcion)}>Cancelar</button>
                       )}
                     </td>
@@ -95,12 +120,14 @@ export default function Inscripciones() {
             <button className="btn btn-secondary" onClick={() => setModal(false)}>Cancelar</button>
             <button className="btn btn-primary" onClick={handleInscribir} disabled={saving}>{saving ? 'Inscribiendo...' : 'Inscribir'}</button>
           </>}>
+          {!isEstudiante && (
           <div className="form-group"><label>Estudiante</label>
             <select value={form.id_estudiante} onChange={e=>setForm(p=>({...p,id_estudiante:e.target.value}))}>
               <option value="">Seleccionar estudiante...</option>
               {estudiantes.map(e => <option key={e.id_estudiante} value={e.id_estudiante}>{e.apellido}, {e.nombre} — {e.documento}</option>)}
             </select>
           </div>
+          )}
           <div className="form-group"><label>Actividad (solo abiertas)</label>
             <select value={form.id_actividad} onChange={e=>setForm(p=>({...p,id_actividad:e.target.value}))}>
               <option value="">Seleccionar actividad...</option>

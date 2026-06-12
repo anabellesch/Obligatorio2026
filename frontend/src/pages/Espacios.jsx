@@ -3,6 +3,7 @@ import { getEspacios, createEspacio, updateEspacio, deleteEspacio } from '../api
 import Modal from '../components/Modal'
 import Confirm from '../components/Confirm'
 import { useToast } from '../components/Toast'
+import { useAuth } from '../context/AuthContext'
 
 export default function Espacios() {
   const toast = useToast()
@@ -13,6 +14,8 @@ export default function Espacios() {
   const [editId, setEditId]   = useState(null)
   const [confirm, setConfirm] = useState(null)
   const [saving, setSaving]   = useState(false)
+  const { hasPermiso } = useAuth()
+  const puedeModificar = hasPermiso('espacios', 'modificar')
 
   const load = useCallback(() => { setLoading(true); getEspacios().then(setData).finally(() => setLoading(false)) }, [])
   useEffect(() => { const t = setTimeout(load, 0); return () => clearTimeout(t) }, [load])
@@ -41,7 +44,9 @@ export default function Espacios() {
     <div>
       <div className="page-header">
         <div><h1>Espacios deportivos</h1><p>{data.length} espacios</p></div>
-        <button className="btn btn-primary" onClick={openCreate}>+ Nuevo espacio</button>
+        {puedeModificar && (
+          <button className="btn btn-primary" onClick={openCreate}>+ Nuevo espacio</button>
+        )}
       </div>
       <div className="card">
         {loading ? <div className="loading">Cargando...</div> : (
@@ -57,8 +62,12 @@ export default function Espacios() {
                     <td>{e.ubicacion}</td>
                     <td>{e.capacidad ? `${e.capacidad} personas` : '—'}</td>
                     <td><div style={{display:'flex',gap:6}}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => openEdit(e)}>Editar</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => setConfirm(e.id_espacio)}>Eliminar</button>
+                      {puedeModificar && (
+                        <button className="btn btn-ghost btn-sm" onClick={() => openEdit(e)}>Editar</button>
+                      )}
+                      {puedeModificar && (
+                        <button className="btn btn-danger btn-sm" onClick={() => setConfirm(e.id_espacio)}>Eliminar</button>
+                      )}
                     </div></td>
                   </tr>
                 ))}

@@ -6,6 +6,7 @@ import Modal from '../components/Modal'
 import Confirm from '../components/Confirm'
 import Badge from '../components/Badge'
 import { useToast } from '../components/Toast'
+import { useAuth } from '../context/AuthContext'
 
 const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
 const ESTADOS = ['abierta','cerrada','finalizada','cancelada']
@@ -24,6 +25,8 @@ export default function Actividades() {
   const [editId, setEditId]       = useState(null)
   const [confirm, setConfirm]     = useState(null)
   const [saving, setSaving]       = useState(false)
+  const { hasPermiso } = useAuth()
+  const puedeModificar = hasPermiso('actividades', 'modificar')
 
   useEffect(() => {
   
@@ -92,7 +95,9 @@ export default function Actividades() {
     <div>
       <div className="page-header">
         <div><h1>Actividades deportivas</h1><p>{data.length} actividades</p></div>
-        <button className="btn btn-primary" onClick={openCreate}>+ Nueva actividad</button>
+        {puedeModificar && (
+          <button className="btn btn-primary" onClick={openCreate}>+ Nueva actividad</button>
+        )}
       </div>
 
       <div className="card">
@@ -121,12 +126,14 @@ export default function Actividades() {
                     <td>{a.cupo_maximo}</td>
                     <td><Badge value={a.estado} /></td>
                     <td>
-                      <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
-                        <button className="btn btn-ghost btn-sm" onClick={() => openEdit(a)}>Editar</button>
-                        {a.estado === 'abierta' && <button className="btn btn-ghost btn-sm" onClick={() => handleEstado(a.id_actividad,'cerrada')}>Cerrar</button>}
-                        {a.estado === 'cerrada' && <button className="btn btn-ghost btn-sm" onClick={() => handleEstado(a.id_actividad,'abierta')}>Abrir</button>}
-                        <button className="btn btn-danger btn-sm" onClick={() => setConfirm(a.id_actividad)}>Eliminar</button>
-                      </div>
+                      {puedeModificar && (
+                        <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                          <button className="btn btn-ghost btn-sm" onClick={() => openEdit(a)}>Editar</button>
+                          {a.estado === 'abierta' && <button className="btn btn-ghost btn-sm" onClick={() => handleEstado(a.id_actividad,'cerrada')}>Cerrar</button>}
+                          {a.estado === 'cerrada' && <button className="btn btn-ghost btn-sm" onClick={() => handleEstado(a.id_actividad,'abierta')}>Abrir</button>}
+                          <button className="btn btn-danger btn-sm" onClick={() => setConfirm(a.id_actividad)}>Eliminar</button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
