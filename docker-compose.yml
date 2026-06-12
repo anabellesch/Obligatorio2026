@@ -1,0 +1,63 @@
+services:
+
+  db:
+    image: mysql:8
+    container_name: mysql_db
+
+    environment:
+      MYSQL_ROOT_PASSWORD: dragonballz1
+      MYSQL_DATABASE: actividades_deportivas
+      MYSQL_USER: dbz1
+      MYSQL_PASSWORD: dragonballz1
+
+    ports:
+      - "3308:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pdragonballz1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+
+    container_name: flask_api
+
+    ports:
+      - "5000:5000"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      DB_HOST: db
+      DB_USER: dbz1
+      DB_PASS: dragonballz1
+      DB_NAME: actividades_deportivas
+
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+
+    container_name: react_app
+
+    ports:
+      - "5173:5173"
+
+    depends_on:
+      - backend
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  mysql-data:
