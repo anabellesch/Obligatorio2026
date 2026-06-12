@@ -3,11 +3,15 @@ from app.db import query, execute
 from app.utils.responses import ok, created, error, not_found, conflict, server_error
 from app.utils.validators import required_fields
 import mysql.connector
+from app.utils.auth import require_jwt
+from app.utils.auth import require_role
 
 bp = Blueprint("inscripciones", __name__)
 
 
 @bp.route("/", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def listar():
     """Lista inscripciones con filtros opcionales: ?id_actividad=X o ?id_estudiante=X"""
     id_actividad  = request.args.get("id_actividad")
@@ -41,6 +45,8 @@ def listar():
 
 
 @bp.route("/<int:id>", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def obtener(id):
     ins = query(
         """SELECT i.*,
@@ -58,6 +64,8 @@ def obtener(id):
 
 
 @bp.route("/", methods=["POST"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def inscribir():
     """
     Reglas de negocio aplicadas en el trigger de BD:
@@ -121,6 +129,8 @@ def inscribir():
 
 
 @bp.route("/<int:id>", methods=["DELETE"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def cancelar(id):
     """Cancela una inscripción (baja lógica cambiando estado a 'cancelada')."""
     ins = query("SELECT * FROM inscripcion WHERE id_inscripcion = %s", (id,), one=True)

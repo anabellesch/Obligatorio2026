@@ -3,16 +3,22 @@ from app.db import query, execute
 from app.utils.responses import ok, created, error, not_found, conflict, server_error
 from app.utils.validators import required_fields
 import mysql.connector
+from app.utils.auth import require_jwt
+from app.utils.auth import require_role
 
 bp = Blueprint("espacios", __name__)
 
 
 @bp.route("/", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def listar():
     return ok(query("SELECT * FROM espacio_deportivo ORDER BY nombre"))
 
 
 @bp.route("/<int:id>", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def obtener(id):
     e = query("SELECT * FROM espacio_deportivo WHERE id_espacio = %s", (id,), one=True)
     if not e:
@@ -21,6 +27,8 @@ def obtener(id):
 
 
 @bp.route("/", methods=["POST"])
+@require_jwt
+@require_role("admin")
 def crear():
     data = request.get_json(silent=True) or {}
     err = required_fields(data, ["nombre"])
@@ -39,6 +47,8 @@ def crear():
 
 
 @bp.route("/<int:id>", methods=["PUT"])
+@require_jwt
+@require_role("admin")
 def actualizar(id):
     e = query("SELECT * FROM espacio_deportivo WHERE id_espacio = %s", (id,), one=True)
     if not e:
@@ -60,6 +70,8 @@ def actualizar(id):
 
 
 @bp.route("/<int:id>", methods=["DELETE"])
+@require_jwt
+@require_role("admin")
 def eliminar(id):
     e = query("SELECT * FROM espacio_deportivo WHERE id_espacio = %s", (id,), one=True)
     if not e:

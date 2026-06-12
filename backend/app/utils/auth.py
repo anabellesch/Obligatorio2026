@@ -15,11 +15,17 @@ def require_jwt(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         token = _extract_token()
+
+        print("TOKEN:", token)
+
         if not token:
             return jsonify({"ok": False, "message": "Token requerido"}), 401
 
         try:
             payload = jwt.decode(token, Config.JWT_SECRET, algorithms=["HS256"])
+
+            print("PAYLOAD:", payload)
+
         except jwt.ExpiredSignatureError:
             return jsonify({"ok": False, "message": "Token expirado"}), 401
         except jwt.InvalidTokenError:

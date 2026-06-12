@@ -88,7 +88,21 @@ CREATE TABLE usuarios (
     password_hash VARCHAR(255) NOT NULL,
     rol           ENUM('admin', 'estudiante', 'profesor') NOT NULL DEFAULT 'estudiante',
     activo        TINYINT(1)   NOT NULL DEFAULT 1,
-    creado_en     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+    creado_en     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_estudiante   INT NULL UNIQUE,
+
+    CONSTRAINT fk_usuario_estudiante
+        FOREIGN KEY (id_estudiante)
+        REFERENCES estudiante(id_estudiante)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE permisos (
+    id_permiso INT AUTO_INCREMENT PRIMARY KEY,
+    rol ENUM('admin', 'profesor', 'estudiante') NOT NULL,
+    seccion VARCHAR(50) NOT NULL,
+    puede_ver TINYINT(1) NOT NULL DEFAULT 0,
+    puede_modificar TINYINT(1) NOT NULL DEFAULT 0,
+    UNIQUE KEY uq_rol_seccion (rol, seccion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
  
 

@@ -3,6 +3,8 @@ from app.db import query, execute
 from app.utils.responses import ok, created, error, not_found, conflict, server_error
 from app.utils.validators import required_fields, valid_email
 import mysql.connector
+from app.utils.auth import require_jwt
+from app.utils.auth import require_role
 
 bp = Blueprint("estudiante", __name__)
  
@@ -12,11 +14,15 @@ def get_or_404(id_estudiante):
     return query("SELECT * FROM estudiante WHERE id_estudiante = %s AND activo = 1", (id_estudiante,), one=True)
 
 @bp.route("/", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor")
 def listar ():
     estudiante = query ("SELECT * FROM estudiante WHERE activo = 1 ORDER BY apellido, nombre")
     return ok(estudiante)
 
 @bp.route("/<int:id_estudiante>", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor")
 def obtener(id_estudiante):
     est = get_or_404(id_estudiante)
     if not est:
@@ -25,6 +31,8 @@ def obtener(id_estudiante):
 
 
 @bp.route("/", methods=["POST"])
+@require_jwt
+@require_role("admin")
 def crear ():
     data = request.get_json(silent=True) or {}
  
@@ -56,6 +64,8 @@ def crear ():
         return server_error(str(e))
 
 @bp.route("/<int:id_estudiante>", methods=["PUT"])
+@require_jwt
+@require_role("admin")
 def actualizar(id_estudiante):
     est = get_or_404(id_estudiante)
     if not est:
@@ -93,6 +103,8 @@ def actualizar(id_estudiante):
 
 
 @bp.route("/<int:id_estudiante>", methods=["DELETE"])
+@require_jwt
+@require_role("admin")
 def eliminar(id_estudiante):
     est = get_or_404(id_estudiante)
 
@@ -110,6 +122,8 @@ def eliminar(id_estudiante):
 
 
 @bp.route("/<int:id_estudiante>/inscripciones", methods=["GET"]) #n CONSLUTA ADICIONAL PARA OBTENER LAS INSCRIPCIONES DE UN ESTUDIANTE
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def inscripciones_del_estudiante(id_estudiante):
     est = get_or_404(id_estudiante)
     if not est:

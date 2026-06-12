@@ -3,11 +3,15 @@ from app.db import query, execute
 from app.utils.responses import ok, created, error, not_found, conflict, server_error
 from app.utils.validators import required_fields
 import mysql.connector
+from app.utils.auth import require_jwt
+from app.utils.auth import require_role
 
 bp = Blueprint("asistencias", __name__)
 
 
 @bp.route("/", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor")
 def listar():
     """Filtros opcionales: ?id_inscripcion=X o ?id_actividad=X&fecha=YYYY-MM-DD"""
     id_inscripcion = request.args.get("id_inscripcion")
@@ -40,6 +44,8 @@ def listar():
 
 
 @bp.route("/", methods=["POST"])
+@require_jwt
+@require_role("admin", "profesor")
 def registrar():
     """
     Registra asistencia para un estudiante confirmado.
@@ -100,6 +106,8 @@ def registrar():
 
 
 @bp.route("/<int:id>", methods=["PUT"])
+@require_jwt
+@require_role("admin", "profesor")
 def actualizar(id):
     asis = query("SELECT * FROM asistencia WHERE id_asistencia = %s", (id,), one=True)
     if not asis:
@@ -112,6 +120,8 @@ def actualizar(id):
 
 
 @bp.route("/<int:id>", methods=["DELETE"])
+@require_jwt
+@require_role("admin", "profesor")
 def eliminar(id):
     asis = query("SELECT * FROM asistencia WHERE id_asistencia = %s", (id,), one=True)
     if not asis:

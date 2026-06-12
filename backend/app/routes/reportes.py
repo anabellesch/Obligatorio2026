@@ -1,11 +1,15 @@
 from flask import Blueprint
 from app.db import query
 from app.utils.responses import ok
+from app.utils.auth import require_jwt
+from app.utils.auth import require_role
 
 bp = Blueprint("reportes", __name__)
 
 
 @bp.route("/actividades-mas-inscriptos", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def actividades_mas_inscriptos():
     rows = query("""
         SELECT a.id_actividad, a.nombre, d.nombre AS disciplina,
@@ -21,6 +25,8 @@ def actividades_mas_inscriptos():
 
 
 @bp.route("/actividades-con-cupo", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def actividades_con_cupo():
     rows = query("""
         SELECT a.id_actividad, a.nombre, a.cupo_maximo, a.dia, a.horario,
@@ -42,6 +48,8 @@ def actividades_con_cupo():
 
 
 @bp.route("/inscriptos-por-disciplina", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def inscriptos_por_disciplina():
     rows = query("""
         SELECT d.nombre AS disciplina,
@@ -57,6 +65,8 @@ def inscriptos_por_disciplina():
 
 
 @bp.route("/inscriptos-por-carrera", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def inscriptos_por_carrera():
     rows = query("""
         SELECT e.carrera, e.facultad,
@@ -70,6 +80,8 @@ def inscriptos_por_carrera():
     return ok(rows)
 
 @bp.route("/ocupacion-actividades", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def ocupacion_actividades():
     rows = query("""
         SELECT a.id_actividad, a.nombre, a.cupo_maximo, a.estado,
@@ -86,6 +98,8 @@ def ocupacion_actividades():
     return ok(rows)
 
 @bp.route("/asistencia-por-actividad", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def asistencia_por_actividad():
     rows = query("""
         SELECT a.id_actividad, a.nombre,
@@ -103,6 +117,8 @@ def asistencia_por_actividad():
 
 
 @bp.route("/estudiantes-con-inasistencias", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def estudiantes_con_inasistencias():
     rows = query("""
         SELECT e.id_estudiante, e.nombre, e.apellido, e.documento, e.carrera,
@@ -122,6 +138,8 @@ def estudiantes_con_inasistencias():
 
 
 @bp.route("/estudiantes-mas-activos", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def estudiantes_mas_activos():
     rows = query("""
         SELECT e.nombre, e.apellido, e.carrera,
@@ -138,6 +156,8 @@ def estudiantes_mas_activos():
 
 
 @bp.route("/lista-de-espera", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def lista_de_espera():
     rows = query("""
         SELECT a.nombre AS actividad, a.cupo_maximo,
@@ -152,6 +172,8 @@ def lista_de_espera():
 
 
 @bp.route("/ocupacion-espacios", methods=["GET"])
+@require_jwt
+@require_role("admin")
 def ocupacion_espacios():
     rows = query("""
         SELECT ed.nombre AS espacio, ed.ubicacion,

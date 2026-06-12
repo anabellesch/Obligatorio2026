@@ -3,6 +3,8 @@ from app.db import query, execute
 from app.utils.responses import ok, created, error, not_found, conflict, server_error
 from app.utils.validators import required_fields, valid_time, ESTADOS_ACTIVIDAD, DIAS_SEMANA
 import mysql.connector
+from app.utils.auth import require_jwt
+from app.utils.auth import require_role
 
 bp = Blueprint("actividades", __name__)
 
@@ -14,6 +16,8 @@ def _get_or_404(id):
 
 
 @bp.route("/", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def listar():
     estado = request.args.get("estado")
     if estado:
@@ -40,6 +44,8 @@ def listar():
 
 
 @bp.route("/<int:id>", methods=["GET"])
+@require_jwt
+@require_role("admin", "profesor", "estudiante")
 def obtener(id):
     a = query(
         """SELECT a.*, d.nombre AS disciplina, e.nombre AS espacio,
@@ -61,6 +67,8 @@ def obtener(id):
 
 
 @bp.route("/", methods=["POST"])
+@require_jwt
+@require_role("admin")
 def crear():
     data = request.get_json(silent=True) or {}
     err = required_fields(data, FIELDS_REQUIRED)
@@ -101,6 +109,8 @@ def crear():
 
 
 @bp.route("/<int:id>", methods=["PUT"])
+@require_jwt
+@require_role("admin")
 def actualizar(id):
     a = _get_or_404(id)
     if not a:
@@ -142,6 +152,8 @@ def actualizar(id):
 
 
 @bp.route("/<int:id>/estado", methods=["PATCH"])
+@require_jwt
+@require_role("admin")
 def cambiar_estado(id):
     a = _get_or_404(id)
     if not a:
@@ -157,6 +169,8 @@ def cambiar_estado(id):
 
 
 @bp.route("/<int:id>", methods=["DELETE"])
+@require_jwt
+@require_role("admin")
 def eliminar(id):
     a = _get_or_404(id)
     if not a:
