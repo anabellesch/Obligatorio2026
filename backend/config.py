@@ -10,3 +10,5 @@ class Config:
     DB_PASSWORD = os.getenv("DB_PASSWORD", "root")
     DB_NAME     = os.getenv("DB_NAME", "actividades_deportivas")
     FLASK_PORT  = int(os.getenv("FLASK_PORT", 5000))
+    JWT_SECRET    = os.getenv("JWT_SECRET",    "CAMBIA_ESTA_CLAVE_EN_PRODUCCION")
+    JWT_EXP_HOURS = int(os.getenv("JWT_EXP_HOURS", 8))

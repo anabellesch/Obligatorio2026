@@ -34,6 +34,20 @@ export default function Sidebar() {
             </NavLink>
           )
         )}
+
+        {onLogout && (
+        <div className="sidebar-footer">
+          {user && (
+            <div className="sidebar-user">
+              <span className="sidebar-user-name">{user.username}</span>
+              <span className="sidebar-user-rol">{user.rol}</span>
+            </div>
+          )}
+          <button className="sidebar-logout-btn" onClick={onLogout}>
+            Cerrar sesión
+          </button>
+        </div>
+      )}
       </nav>
     </aside>
   )
