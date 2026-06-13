@@ -65,7 +65,7 @@ def obtener(id):
 
 @bp.route("/", methods=["POST"])
 @require_jwt
-@require_role("admin", "profesor", "estudiante")
+@require_role("admin", "estudiante")
 def inscribir():
     """
     Reglas de negocio aplicadas en el trigger de BD:
@@ -130,7 +130,7 @@ def inscribir():
 
 @bp.route("/<int:id>", methods=["DELETE"])
 @require_jwt
-@require_role("admin", "profesor", "estudiante")
+@require_role("admin", "estudiante")
 def cancelar(id):
     """Cancela una inscripción (baja lógica cambiando estado a 'cancelada')."""
     ins = query("SELECT * FROM inscripcion WHERE id_inscripcion = %s", (id,), one=True)

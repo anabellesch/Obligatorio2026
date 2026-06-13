@@ -70,8 +70,10 @@ export default function Inscripciones() {
     <div>
       <div className="page-header">
         <div><h1>{isEstudiante ? 'Mis Inscripciones' : 'Inscripciones'}</h1><p>{data.length} registradas</p></div>
-        {puedeModificar && (
-          <button className="btn btn-primary" onClick={openModal}>+ Nueva inscripción</button>
+        {(isEstudiante || puedeModificar) && (
+          <button className="btn btn-primary" onClick={openModal}>
+            + Nueva inscripción
+          </button>
         )}
       </div>
 
@@ -101,9 +103,10 @@ export default function Inscripciones() {
                     <td><Badge value={i.estado} />{i.orden_espera && <small style={{color:'var(--gray-400)',marginLeft:4}}>#{i.orden_espera}</small>}</td>
                     <td>{new Date(i.fecha_inscripcion).toLocaleDateString('es-UY')}</td>
                     <td>
-                      {puedeModificar &&
+                      {(isEstudiante || puedeModificar) && (
                         i.estado !== 'cancelada' && (
-                        <button className="btn btn-danger btn-sm" onClick={() => setConfirm(i.id_inscripcion)}>Cancelar</button>
+                          <button className="btn btn-danger btn-sm" onClick={() => setConfirm(i.id_inscripcion)}>Cancelar</button>
+                        )
                       )}
                     </td>
                   </tr>
