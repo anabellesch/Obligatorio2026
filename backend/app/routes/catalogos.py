@@ -1,36 +1,43 @@
 from flask import Blueprint
-import mysql.connector
+from app.db import get_connection, query, execute
 from app.utils.responses import ok
 from app.utils.auth import require_jwt
-from app.db import get_connection
 
-bp = Blueprint("catalogos", __name__)
+bp = Blueprint("catalogos", __name__, url_prefix="/catalogos")
 
 @bp.route("/carreras", methods=["GET"])
 @require_jwt
 def carreras():
     conn = get_connection()
-    cur = conn.cursor(dictionary=True)
+    try:
+        cursor = conn.cursor(dictionary=True)
 
-    cur.execute("""
-        SELECT DISTINCT carrera
-        FROM estudiante
-        ORDER BY carrera
-    """)
+        cursor.execute("""
+            SELECT DISTINCT carrera
+            FROM estudiante
+            ORDER BY carrera
+        """)
 
-    return ok(cur.fetchall())
+        return ok(cursor.fetchall())
+    finally:
+        cursor.close()
+        conn.close()
 
 
 @bp.route("/facultades", methods=["GET"])
 @require_jwt
 def facultades():
     conn = get_connection()
-    cur = conn.cursor(dictionary=True)
+    try:
+        cursor = conn.cursor(dictionary=True)
 
-    cur.execute("""
-        SELECT DISTINCT facultad
-        FROM estudiante
-        ORDER BY facultad
-    """)
+        cursor.execute("""
+            SELECT DISTINCT facultad
+            FROM estudiante
+            ORDER BY facultad
+        """)
 
-    return ok(cur.fetchall())
+        return ok(cursor.fetchall())
+    finally:
+        cursor.close()
+        conn.close()
