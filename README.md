@@ -78,4 +78,5 @@ La API expone sus endpoints bajo el prefijo `/api`, agrupados por entidad:
 - `/api/asistencias`
 - `/api/reportes` — reportes y estadísticas para el rol admin
 - `/api/catalogos`
+
 El acceso a cada sección está controlado por un sistema de permisos por rol (`admin`, `profesor`, `estudiante`), definido en la tabla `permisos` y devuelto por la API al iniciar sesión.
