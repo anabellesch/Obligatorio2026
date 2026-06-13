@@ -18,7 +18,7 @@ VALUES
 ('Cancha de voley', 'Edificio Deportivo', 20);
 
 INSERT INTO estudiante
-(id_estudiante, documento, nombre, apellido, email, carrera, facultad)
+(documento, nombre, apellido, email, carrera, facultad)
 VALUES
 ('54879612', 'Luciano', 'Rodríguez', 'luciano@correo.com', 'Ingeniería en Informática', 'Ingeniería'),
 ('51234789', 'Anabelle', 'schenck', 'ana@correo.com', 'Ingeniería en informática', 'Ingeniería'),
@@ -241,13 +241,11 @@ VALUES
 (97, 11, 'confirmada'),
 (98, 11, 'confirmada'),
 (99, 11, 'confirmada'),
-(100, 11, 'confirmada'),
+(100, 11, 'confirmada');
 
 
 INSERT INTO asistencia
-(id_inscripcion, fecha, presente)
-VALUES
-<<<<<<< HEAD
+(id_inscripcion, fecha, presente) VALUES
 (1, '2026-05-18', 1),
 (2, '2026-05-18', 0),
 (3, '2026-05-20', 1),

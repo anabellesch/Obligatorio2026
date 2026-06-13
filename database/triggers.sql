@@ -1,6 +1,6 @@
 USE actividades_deportivas; 
 
-/**
+
 DELIMITER $$
 
 CREATE TRIGGER trg_validad_actividad_abierta
@@ -12,7 +12,7 @@ BEGIN
     SELECT estado
     INTO estadoActividad
     FROM actividad
-    WHERE id_actividad O NEW.id_actividad;
+    WHERE id_actividad = NEW.id_actividad;
 
     IF estadoActividad <> 'abierta' THEN
         SIGNAL SQLSTATE '45000'
@@ -20,10 +20,10 @@ BEGIN
     END IF;
 
 END$$
-DELIMITER;
 
-DELIMITER $$
-**/
+
+
+
 
 CREATE TRIGGER trg_controlar_cupo
 BEFORE INSERT ON inscripcion
@@ -42,7 +42,7 @@ BEGIN
     INTO cantidad_confirmados
     FROM inscripcion
     WHERE id_actividad = NEW.id_actividad
-    AND estado = 'confirmada';
+      AND estado = 'confirmada';
 
     IF cantidad_confirmados >= cupo THEN
 
@@ -52,27 +52,22 @@ BEGIN
         INTO siguiente_espera
         FROM inscripcion
         WHERE id_actividad = NEW.id_actividad
-        AND estado='en_espera';
+          AND estado = 'en_espera';
 
         SET NEW.orden_espera = siguiente_espera;
 
     ELSE
 
-        SET NEW.estado='confirmada';
-        SET NEW.orden_espera=NULL;
+        SET NEW.estado = 'confirmada';
+        SET NEW.orden_espera = NULL;
 
     END IF;
-
 END$$
 
-DELIMITER ;
-
-DELIMITER $$
 CREATE TRIGGER trg_validar_asistencia
 BEFORE INSERT ON asistencia
 FOR EACH ROW
 BEGIN
-
     DECLARE estadoInscripcion VARCHAR(20);
 
     SELECT estado
@@ -85,9 +80,7 @@ BEGIN
         SET MESSAGE_TEXT =
         'Solo se puede registrar asistencia de inscripciones confirmadas';
     END IF;
-
 END$$
 
 DELIMITER ;
-
 

@@ -4,35 +4,46 @@ import Modal from '../components/Modal'
 import Confirm from '../components/Confirm'
 import { useToast } from '../components/Toast'
 import { useAuth } from '../context/AuthContext'
+import { getCarreras, getFacultades } from '../api/catalogos'
 
-const EMPTY = { documento:'', nombre:'', apellido:'', email:'', carrera:'', facultad:'' }
+const EMPTY = { documento: '', nombre: '', apellido: '', email: '', carrera: '', facultad: '' }
 
 export default function Estudiantes() {
   const toast = useToast()
   const { hasPermiso } = useAuth()
-  const [data, setData]         = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [search, setSearch]     = useState('')
-  const [modal, setModal]       = useState(null)   
-  const [form, setForm]         = useState(EMPTY)
-  const [editId, setEditId]     = useState(null)
-  const [confirm, setConfirm]   = useState(null)
-  const [saving, setSaving]     = useState(false)
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [modal, setModal] = useState(null)
+  const [form, setForm] = useState(EMPTY)
+  const [editId, setEditId] = useState(null)
+  const [confirm, setConfirm] = useState(null)
+  const [saving, setSaving] = useState(false)
   const puedeModificar = hasPermiso('estudiantes', 'modificar')
+  const [carreras, setCarreras] = useState([])
+  const [facultades, setFacultades] = useState([])
+
   
+
+
   const load = useCallback(() => {
     setLoading(true)
     getEstudiantes().then(setData).catch(() => toast('Error al cargar estudiantes', 'error')).finally(() => setLoading(false))
   }, [toast])
- 
+
   useEffect(() => { const t = setTimeout(load, 0); return () => clearTimeout(t) }, [load])
+
+  useEffect(() => {
+    getCarreras().then(setCarreras)
+    getFacultades().then(setFacultades)
+  }, [])
 
   const filtered = data.filter(e =>
     `${e.nombre} ${e.apellido} ${e.documento} ${e.email}`.toLowerCase().includes(search.toLowerCase())
   )
 
   const openCreate = () => { setForm(EMPTY); setEditId(null); setModal('create') }
-  const openEdit   = (e)  => { setForm({ documento:e.documento, nombre:e.nombre, apellido:e.apellido, email:e.email, carrera:e.carrera, facultad:e.facultad }); setEditId(e.id_estudiante); setModal('edit') }
+  const openEdit = (e) => { setForm({ documento: e.documento, nombre: e.nombre, apellido: e.apellido, email: e.email, carrera: e.carrera, facultad: e.facultad }); setEditId(e.id_estudiante); setModal('edit') }
 
   const handleSave = async () => {
     if (!form.documento || !form.nombre || !form.apellido || !form.email || !form.carrera || !form.facultad)
@@ -43,7 +54,7 @@ export default function Estudiantes() {
       else await updateEstudiante(editId, form)
       toast(modal === 'create' ? 'Estudiante creado' : 'Estudiante actualizado')
       setModal(null); load()
-    } catch(e) { toast(e.message, 'error') }
+    } catch (e) { toast(e.message, 'error') }
     finally { setSaving(false) }
   }
 
@@ -52,10 +63,10 @@ export default function Estudiantes() {
       await deleteEstudiante(confirm)
       toast('Estudiante eliminado')
       setConfirm(null); load()
-    } catch(e) { toast(e.message, 'error') }
+    } catch (e) { toast(e.message, 'error') }
   }
 
-  const f = (field) => ({ value: form[field], onChange: e => setForm(p => ({...p, [field]: e.target.value})) })
+  const f = (field) => ({ value: form[field], onChange: e => setForm(p => ({ ...p, [field]: e.target.value })) })
 
   return (
     <div>
@@ -88,7 +99,7 @@ export default function Estudiantes() {
                     <td>{e.facultad}</td>
                     <td>
                       {puedeModificar && (
-                        <div style={{display:'flex',gap:6}}>
+                        <div style={{ display: 'flex', gap: 6 }}>
                           <button className="btn btn-ghost btn-sm" onClick={() => openEdit(e)}>Editar</button>
                           <button className="btn btn-danger btn-sm" onClick={() => setConfirm(e.id_estudiante)}>Eliminar</button>
                         </div>
@@ -116,8 +127,28 @@ export default function Estudiantes() {
             <div className="form-group"><label>Nombre</label><input {...f('nombre')} /></div>
             <div className="form-group"><label>Apellido</label><input {...f('apellido')} /></div>
           </div>
-          <div className="form-group"><label>Carrera</label><input {...f('carrera')} /></div>
-          <div className="form-group"><label>Facultad</label><input {...f('facultad')} /></div>
+          <div className="form-group">
+            <label>Carrera</label>
+            <select {...f('carrera')}>
+              <option value="">Seleccione una carrera</option>
+              {carreras.map(c => (
+                <option key={c.carrera} value={c.carrera}>
+                  {c.carrera}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Facultad</label>
+            <select {...f('facultad')}>
+              <option value="">Seleccione una facultad</option>
+              {facultades.map(f => (
+                <option key={f.facultad} value={f.facultad}>
+                  {f.facultad}
+                </option>
+              ))}
+            </select>
+          </div>
         </Modal>
       )}
 
